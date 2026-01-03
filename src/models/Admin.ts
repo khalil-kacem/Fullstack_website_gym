@@ -1,24 +1,17 @@
 import mongoose, { Document, Model, Schema } from 'mongoose';
 import bcrypt from 'bcryptjs';
 
-export interface IUser extends Document {
+export interface IAdmin extends Document {
   _id: string;
   name: string;
   email: string;
   password: string;
-  role: 'admin' | 'membre';
-  gender: 'homme' | 'femme';
-  dob: Date;
-  phone?: string;
   createdAt: Date;
   updatedAt: Date;
-  lastLogin?: Date;
-  isActive: boolean;
-  trainingType: 'musculation' | 'box' | 'cardio' | 'danse';
   comparePassword(candidatePassword: string): Promise<boolean>;
 }
 
-const UserSchema = new Schema<IUser>(
+const AdminSchema = new Schema<IAdmin>(
   {
     name: {
       type: String,
@@ -42,34 +35,7 @@ const UserSchema = new Schema<IUser>(
       type: String,
       required: [true, 'Le mot de passe est requis'],
       minlength: [6, 'Le mot de passe doit contenir au moins 6 caractères'],
-    },
-    role: {
-      type: String,
-      enum: ['admin', 'membre'],
-      default: 'membre',
-      required: [true, 'Le rôle est requis'],
-    },
-    gender: {
-      type: String,
-      enum: ['homme', 'femme'],
-    },
-    dob: {
-      type: Date,
-    },
-    phone: {
-      type: String,
-      trim: true,
-    },
-    trainingType: {
-      type: String,
-      enum: ['musculation', 'box', 'cardio', 'danse'],
-    },
-    lastLogin: {
-      type: Date,
-    },
-    isActive: {
-      type: Boolean,
-      default: true,
+      select: false,
     },
   },
   {
@@ -78,7 +44,7 @@ const UserSchema = new Schema<IUser>(
 );
 
 // Hash mot de passe avant sauvegarde
-UserSchema.pre('save', async function (next) {
+AdminSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();
 
   try {
@@ -91,7 +57,8 @@ UserSchema.pre('save', async function (next) {
 });
 
 // Comparaison des mots de passe
-UserSchema.methods.comparePassword = async function (
+type CompareFunction = (candidatePassword: string) => Promise<boolean>;
+AdminSchema.methods.comparePassword = async function (
   candidatePassword: string
 ): Promise<boolean> {
   try {
@@ -101,7 +68,7 @@ UserSchema.methods.comparePassword = async function (
   }
 };
 
-const Utilisateur: Model<IUser> =
-  mongoose.models.Utilisateur || mongoose.model<IUser>('Utilisateur', UserSchema);
+const Admin: Model<IAdmin> =
+  mongoose.models.Admin || mongoose.model<IAdmin>('Admin', AdminSchema);
 
-export default Utilisateur;
+export default Admin;

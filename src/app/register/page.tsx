@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { User, Mail, Lock, Phone, Calendar, Users, AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
+import { User, Mail, Lock, Phone, Calendar, Users, Dumbbell, AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -17,6 +17,7 @@ export default function RegisterPage() {
     phone: '',
     password: '',
     confirmPassword: '',
+    trainingType: '', // ⭐ AJOUTÉ
   });
 
   const [error, setError] = useState('');
@@ -38,6 +39,11 @@ export default function RegisterPage() {
       return;
     }
 
+    if (!formData.trainingType) {
+      setError('Veuillez choisir un type d’entraînement');
+      return;
+    }
+
     setIsLoading(true);
 
     try {
@@ -51,6 +57,8 @@ export default function RegisterPage() {
           dob: formData.dob,
           phone: formData.phone,
           password: formData.password,
+          trainingType: formData.trainingType, 
+          role:"membre"
         }),
       });
 
@@ -82,7 +90,6 @@ export default function RegisterPage() {
 
           {/* Header */}
           <div className="text-center mb-8">
-         
             <h1 className="text-3xl font-bold text-gray-900 mb-2">Inscription Membre</h1>
             <p className="text-gray-600">Créez votre compte pour commencer</p>
           </div>
@@ -170,6 +177,27 @@ export default function RegisterPage() {
               </div>
             </div>
 
+            {/* Training Type ⭐ AJOUTÉ */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Type d'entraînement *</label>
+              <div className="relative">
+                <Dumbbell className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <select
+                  name="trainingType"
+                  required
+                  value={formData.trainingType}
+                  onChange={handleChange}
+                  className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-lg text-black bg-white focus:ring-2 focus:ring-purple-500 outline-none cursor-pointer"
+                >
+                  <option value="">Sélectionnez</option>
+                  <option value="musculation">Musculation</option>
+                  <option value="box">Box</option>
+                  <option value="cardio">Cardio</option>
+                  <option value="danse">Danse</option>
+                </select>
+              </div>
+            </div>
+
             {/* DOB */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Date de naissance *</label>
@@ -243,7 +271,7 @@ export default function RegisterPage() {
               whileTap={{ scale: 0.98 }}
               disabled={isLoading || success}
               type="submit"
-              className="w-full bg-black text-white py-3 rounded-lg font-semibold hover:from-purple-600 hover:to-blue-700 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+              className="w-full bg-black text-white py-3 rounded-lg font-semibold flex items-center justify-center gap-2 disabled:opacity-50"
             >
               {isLoading ? (
                 <>
@@ -264,14 +292,12 @@ export default function RegisterPage() {
           <div className="mt-6 text-center">
             <p className="text-gray-600">
               Vous avez déjà un compte ?{' '}
-              <Link href="/login" className="text-black font-semibold hover:text-purple-700">
+              <Link href="/login" className="text-black font-semibold">
                 Se connecter
               </Link>
             </p>
           </div>
         </div>
-
-    
       </motion.div>
     </div>
   );
